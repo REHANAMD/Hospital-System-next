@@ -92,8 +92,10 @@ export default function AssignTaskPage() {
 
         <div className="space-y-1">
           <Label className="text-gray-800">Due Date</Label>
-          <Calendar mode="single" selected={date} onSelect={setDate} />
-          <p className="text-sm text-gray-500">
+          <div className="rounded-md border bg-white text-black p-2 shadow-sm w-fit">
+            <Calendar mode="single" selected={date} onSelect={setDate} />
+          </div>
+          <p className="text-sm text-gray-600">
             Selected: {date ? format(date, "PPP") : "None"}
           </p>
         </div>
