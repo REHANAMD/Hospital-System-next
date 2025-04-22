@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 import { format } from "date-fns";
 import { Input } from "@/components/ui/input";
@@ -6,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { toast } from "sonner";
+import { useRouter } from "next/router";
 
 export default function AssignTaskPage() {
   const [title, setTitle] = useState("");
@@ -13,6 +15,7 @@ export default function AssignTaskPage() {
   const [employeeId, setEmployeeId] = useState("");
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async () => {
     if (!title || !desc || !employeeId || !date) {
@@ -38,8 +41,6 @@ export default function AssignTaskPage() {
       if (!res.ok) throw new Error(data.message || "Failed to assign task");
 
       toast.success("✅ Task created successfully");
-
-      // Reset form
       setTitle("");
       setDesc("");
       setEmployeeId("");
@@ -52,11 +53,19 @@ export default function AssignTaskPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8 space-y-6">
-      <h1 className="text-2xl font-bold text-gray-800">📝 Assign New Task</h1>
+    <div className="min-h-screen bg-gray-100 px-6 py-8 relative">
+      {/* Button fixed to top-left */}
+      <div className="absolute top-6 left-6">
+        <Button variant="outline" onClick={() => router.push("/admin")}>
+          ← Back to Dashboard
+        </Button>
+      </div>
 
-      <div className="grid gap-4 max-w-xl bg-white p-6 rounded-xl shadow-md border">
+      <h1 className="text-2xl font-bold text-gray-800 text-center mb-6">
+        📝 Assign New Task
+      </h1>
 
+      <div className="grid gap-4 bg-white p-6 rounded-xl shadow-md border max-w-xl mx-auto">
         <div className="space-y-1">
           <Label htmlFor="title" className="text-gray-800">Task Title</Label>
           <Input
@@ -90,12 +99,12 @@ export default function AssignTaskPage() {
           />
         </div>
 
-        <div className="space-y-1">
+        <div className="space-y-1 text-center">
           <Label className="text-gray-800">Due Date</Label>
-          <div className="rounded-md border bg-white text-black p-2 shadow-sm w-fit">
+          <div className="flex justify-center text-gray-800">
             <Calendar mode="single" selected={date} onSelect={setDate} />
           </div>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 mt-2">
             Selected: {date ? format(date, "PPP") : "None"}
           </p>
         </div>
