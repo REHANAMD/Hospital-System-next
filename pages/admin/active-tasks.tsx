@@ -10,7 +10,21 @@ export default function ViewReports() {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const res = await fetch(`${window.location.origin}/api/tasks/fetch`);
+        const token = localStorage.getItem("token");
+        if (!token) {
+          router.push("/login");
+          return;
+        }
+
+        const res = await fetch("/api/active-tasks", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) throw new Error("Failed to fetch tasks");
+
         const data = await res.json();
         setTasks(data.tasks || []);
       } catch (err) {
@@ -25,7 +39,9 @@ export default function ViewReports() {
     try {
       await fetch(`/api/tasks/update-status`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ taskId, status: checked ? "completed" : "pending" }),
       });
 

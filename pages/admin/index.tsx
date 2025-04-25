@@ -1,16 +1,58 @@
 "use client";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { FilePlus, FileText, Users } from "lucide-react";
 
 export default function AdminDashboard() {
   const router = useRouter();
+  const [tasks, setTasks] = useState([]);
+  const [adminName, setAdminName] = useState("");
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     router.push("/login");
   };
+
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          router.push("/login");
+          return;
+        }
+
+        // 🎯 Decode token to get admin name
+        const base64Url = token.split('.')[1];
+const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+const decoded: any = JSON.parse(atob(base64));
+setAdminName(decoded.name || "Admin");
+
+
+        // 🔐 Fetch tasks for this admin
+        const res = await fetch("/api/fetchTasks", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) throw new Error("Token invalid or expired");
+
+        const data = await res.json();
+        setTasks(data.tasks);
+        console.log("🎯 Personalized Tasks:", data.tasks);
+      } catch (err) {
+        console.error("❌ Error fetching tasks:", err);
+        handleLogout();
+      }
+    };
+
+    fetchTasks();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-100 p-6 relative">
@@ -28,7 +70,12 @@ export default function AdminDashboard() {
       </div>
 
       {/* 💬 Header */}
-      <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">🏥 Welcome, Admin</h1>
+      <h1 className="text-3xl font-bold text-gray-800 mb-2 text-center">
+        Welcome, {adminName}
+      </h1>
+      <p className="text-center text-gray-500 mb-8">
+         You have assigned {tasks.length} tasks.
+      </p>
 
       {/* 📦 Dashboard Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto mb-10">
@@ -75,14 +122,14 @@ export default function AdminDashboard() {
           onClick={() => router.push("/admin/assign-task")}
           className="bg-blue-600 hover:bg-blue-700 text-white"
         >
-          ➕ Assign New Task
+           Assign New Task
         </Button>
 
         <Button
           onClick={() => router.push("/admin/active-tasks")}
           variant="outline"
         >
-          📋 View Active Tasks
+           View Active Tasks
         </Button>
       </div>
     </div>

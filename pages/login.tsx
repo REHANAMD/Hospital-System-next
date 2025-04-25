@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import ReCAPTCHA from "react-google-recaptcha";
 import { useRouter } from "next/router";
 
+
 export default function LoginPage() {
   const router = useRouter();
   const [empId, setEmpId] = useState("");
@@ -31,11 +32,13 @@ export default function LoginPage() {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Login failed");
+      localStorage.setItem("token", data.token);
 
       toast.success("✅ Login successful");
       if (role === "admin" && data.adminId) {
-        localStorage.setItem("adminId", data.adminId);
         console.log("💾 Stored adminId:", data.adminId);
+        localStorage.setItem("adminId", data.adminId);
+      
       }
        else if (role === "employee" && data.empId) {
         localStorage.setItem("empId", data.empId);
