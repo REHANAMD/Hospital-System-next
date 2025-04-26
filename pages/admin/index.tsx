@@ -27,9 +27,9 @@ export default function AdminDashboard() {
 
         // 🎯 Decode token to get admin name
         const base64Url = token.split('.')[1];
-const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-const decoded: any = JSON.parse(atob(base64));
-setAdminName(decoded.name || "Admin");
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const decoded: any = JSON.parse(atob(base64));
+        setAdminName(decoded.name || "Admin");
 
 
         // 🔐 Fetch tasks for this admin
